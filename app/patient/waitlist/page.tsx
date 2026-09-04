@@ -1,0 +1,14 @@
+"use client";
+
+import { CalendarClock, Check, MapPin, RefreshCcw } from "lucide-react";
+import { AppShell } from "@/components/app-shell";
+import { PageHeader } from "@/components/page-header";
+import { useDemo } from "@/components/demo-provider";
+
+export default function PatientWaitlistPage() {
+  const { demoState, updateDemoState, showToast } = useDemo();
+  const accept = () => { updateDemoState({ waitlistAccepted: true }); showToast("Earlier appointment accepted"); };
+  return <AppShell role="patient"><PageHeader eyebrow="Smart waitlist" title="An earlier appointment became available" description="This opening matches your visit type, availability, sample insurance, and preferred travel range." />
+    <div className="grid-2"><section className="card result-hero"><span className="badge badge-green"><RefreshCcw size={12} /> Earlier opening</span><h2>Tomorrow at 2:00 PM</h2><p>Casey Hughes, APRN · Ozark Grove Family Clinic · Bentonville</p><div className="info-list"><div className="info-row"><div className="info-icon"><CalendarClock size={16} /></div><div><strong>Primary care · In person</strong><span>About 10 minutes expected wait</span></div></div><div className="info-row"><div className="info-icon"><MapPin size={16} /></div><div><strong>2.8 miles away</strong><span>Within your preferred travel range</span></div></div></div>{demoState.waitlistAccepted ? <div className="success-panel"><div className="success-icon"><Check size={22} /></div><strong>Earlier appointment accepted</strong><p className="small muted">Your previous appointment would be released only after confirmation.</p></div> : <div className="inline-actions" style={{ marginTop: 22 }}><button className="btn btn-primary" onClick={accept}>Accept appointment</button><button className="btn btn-secondary" onClick={() => showToast("Your existing appointment was kept")}>Keep existing appointment</button></div>}</section><aside className="stack"><section className="card card-pad"><h2 className="section-title">How matching works</h2><p className="small muted" style={{ lineHeight: 1.7 }}>CareFlow identifies eligible patients based on appointment type, provider compatibility, stated availability, travel range, accessibility, and sample insurance compatibility.</p><div className="notice notice-info"><Check size={17} />Your place in care is never penalized if you decline.</div></section><section className="card card-pad"><h2 className="section-title">Your waitlist preferences</h2><div className="request-list"><div className="request-item"><span>Timing</span><strong>Earlier than current</strong></div><div className="request-item"><span>Availability</span><strong>After 1 PM</strong></div><div className="request-item"><span>Distance</span><strong>Within 10 miles</strong></div><div className="request-item"><span>Format</span><strong>In person</strong></div></div></section></aside></div>
+  </AppShell>;
+}

@@ -1,0 +1,19 @@
+"use client";
+
+import { ArrowLeft, Check, ClipboardCheck, FileWarning, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { AppShell } from "@/components/app-shell";
+import { PageHeader } from "@/components/page-header";
+import { StatusBadge } from "@/components/status-badge";
+import { useDemo } from "@/components/demo-provider";
+import { buildPreVisitSummary } from "@/lib/ai/pre-visit-summary";
+
+export default function ProviderBriefPage() {
+  const { careRequest, demoState, showToast } = useDemo();
+  const brief = buildPreVisitSummary(careRequest);
+  return <AppShell role="provider"><PageHeader eyebrow="Patient pre-visit brief" title="Jordan Lee" description="Today · 4:20 PM · Dr. Maya Patel · Ozark Grove Family Clinic" actions={<><Link className="btn btn-secondary" href="/provider"><ArrowLeft size={15} /> Schedule</Link><button className="btn btn-primary" onClick={() => showToast("Brief acknowledged for review")}><Check size={15} /> Mark reviewed</button></>} />
+    <div className="grid-2"><article className="card"><div className="brief-header"><div style={{ display: "flex", justifyContent: "space-between", gap: 20, alignItems: "flex-start" }}><div><span className="eyebrow" style={{ color: "#a6d7c9" }}>Patient-reported</span><h2 style={{ fontSize: 25, margin: "10px 0 7px" }}>{careRequest.concern}</h2><p>{brief.summary}</p></div><StatusBadge tone={demoState.preparationComplete ? "green" : "amber"}>{demoState.preparationComplete ? "Ready" : "1 item to review"}</StatusBadge></div></div><div className="brief-grid"><Brief label="Reason for visit" value={careRequest.concern} /><Brief label="Duration" value={careRequest.duration} /><Brief label="Reported concerns" value="Persistent cough; would like to be checked. No clinical conclusion generated." /><Brief label="Visit preference" value={`${careRequest.format} · ${careRequest.availability}`} /><Brief label="Current medications" value="Sample medication A (patient-reported)" /><Brief label="Allergies" value="None reported" /><Brief label="Relevant history" value="Seasonal allergies (patient-reported)" /><Brief label="Forms" value={demoState.preparationComplete ? "Complete · 7 of 7" : "Incomplete · 3 of 7"} /></div><div className="brief-section"><div className="brief-label">Safety-screening statement</div><div className="brief-value">{brief.safetyStatement}</div></div></article><aside className="stack"><section className="card card-pad"><div className="section-head"><div><h2 className="section-title">Items requiring review</h2></div><span className={`badge ${demoState.preparationComplete ? "badge-green" : "badge-amber"}`}>{demoState.preparationComplete ? "0" : "1"}</span></div>{demoState.preparationComplete ? <div className="notice notice-info"><Check size={17} />No preparation items are currently missing.</div> : <div className="notice notice-warning"><FileWarning size={17} />Current medication details need confirmation.</div>}</section><section className="card card-pad"><h2 className="section-title">Summary boundaries</h2><div className="info-list"><div className="info-row"><div className="info-icon"><ClipboardCheck size={15} /></div><div><strong>Organizes patient reports</strong><span>Uses neutral language and highlights missing fields.</span></div></div><div className="info-row"><div className="info-icon"><ShieldCheck size={15} /></div><div><strong>No clinical assumptions</strong><span>No diagnosis, risk label, treatment suggestion, or final care decision.</span></div></div></div></section><Link href="/analytics" className="btn btn-secondary">Continue demo to analytics</Link></aside></div>
+  </AppShell>;
+}
+
+function Brief({ label, value }: { label: string; value: string }) { return <div className="brief-section"><div className="brief-label">{label}</div><div className="brief-value">{value}</div></div>; }
