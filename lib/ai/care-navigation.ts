@@ -26,6 +26,15 @@ export function navigateCare(request: CareRequest): NavigationResult {
     };
   }
 
+  if (request.specialty && request.specialty !== "Primary Care") {
+    return {
+      category: "Specialist / referral review",
+      title: `${request.specialty} care search`,
+      explanation: `CareFlow can help search for ${request.specialty.toLowerCase()} providers and facilities within your travel preferences. A licensed professional or health plan may need to confirm whether a referral is required.`,
+      urgent: false,
+    };
+  }
+
   return {
     category: "Routine / primary care",
     title: "Primary care visit",

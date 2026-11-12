@@ -2,7 +2,7 @@
 
 CareFlow AR is a polished full-stack prototype for the work that happens **before** a healthcare appointment. It guides a patient from a plain-language care request through conservative care navigation, transparent appointment matching, booking, and digital preparation. The same workflow gives clinic staff an operations view and gives providers a concise patient-reported pre-visit brief.
 
-The initial concept is focused on healthcare access in Arkansas, including rural access, travel distance, telehealth, accessibility, and transportation preferences.
+The initial concept is focused on healthcare access in Arkansas while supporting distance-based care discovery across state borders, including rural access, travel distance, telehealth, accessibility, and transportation preferences.
 
 > CareFlow AR is a student healthcare innovation prototype. It is not a medical device or diagnostic system. It does not diagnose, prescribe, replace clinicians or emergency services, determine clinical priority, or guarantee that a care setting is appropriate. All people, clinics, providers, insurance plans, addresses, and metrics are fictional or simulated.
 
@@ -113,7 +113,10 @@ Validation commands:
 npx tsc --noEmit
 npm run lint
 npm run build
+npm run test:e2e
 ```
+
+The Playwright suite starts or reuses the local server, exercises all 23 user-facing routes, and covers desktop and mobile Chromium workflows. Install its browser runtime once with `npx playwright install chromium`. The HTML result is written to `playwright-report/` and is intentionally ignored by Git.
 
 Generate a migration after changing `db/schema.ts`:
 
@@ -128,13 +131,15 @@ For a local D1 database, apply the generated migration and `db/seed.sql` with th
 Copy `.env.example` to `.env.local` only when connecting optional services.
 
 ```text
-AI_API_KEY=
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5-mini
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-- `AI_API_KEY` is optional and intentionally unused by safety decisions. A future server-only adapter can use it to improve language extraction or neutral summarization.
+- `OPENAI_API_KEY` enables the official server-side OpenAI SDK adapter. It is never exposed to the browser; deterministic emergency-warning rules run before model calls. Without it, Find Care AI clearly identifies its deterministic demo mode.
+- `OPENAI_MODEL` selects the server-side model and defaults to `gpt-5-mini`.
 - Supabase variables are optional. Never expose the service-role key in client code or commit secrets.
 - The prototype contains no real healthcare-system integration.
 
@@ -205,6 +210,7 @@ No real EHR, insurer, calendar, provider directory, or messaging service is cont
 - Demo rules are not clinically validated.
 - Providers, clinics, patients, insurance plans, addresses, wait estimates, and metrics are fictional.
 - Authentication is simulated with role-entry buttons. Production should use Supabase Auth or an enterprise identity provider, strong authorization checks, and reviewed RLS policies.
+- Provider, clinic, and hospital discovery uses an explicitly synthetic offline directory and city-centroid straight-line distances. A licensed directory/geocoding source is still required for verified identities, street addresses, phone numbers, affiliations, and live status.
 - The no-show feature is a responsible-workflow demonstration, not a validated prediction model.
 - Operational impact is illustrative and must not be presented as measured or proven.
 - Production use needs threat modeling, encryption review, consent and retention policies, accessibility testing, clinical safety review, incident response, legal review, and compliance assessment.

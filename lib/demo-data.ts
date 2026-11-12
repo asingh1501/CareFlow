@@ -11,6 +11,8 @@ export const initialCareRequest = {
   accessibility: [] as string[],
   transportationDifficulty: false,
   emergencyWarning: false,
+  specialty: "Primary Care",
+  radiusMiles: 100,
 };
 
 export const initialDemoState: DemoState = {
@@ -19,6 +21,32 @@ export const initialDemoState: DemoState = {
   completedForms: ["reason", "basic", "appointment"],
   waitlistAccepted: false,
   jordanStatus: "Confirmed",
+  preferences: {
+    location: "Bentonville, AR",
+    zipCode: "72712",
+    specialty: "Primary Care",
+    radiusMiles: 100,
+    format: "Either",
+    preferredDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    timeRange: "After 3:00 PM",
+    accessibility: [],
+  },
+  favorites: [],
+  appointmentRequests: [],
+  profile: {
+    fullName: "Jordan Lee",
+    preferredName: "Jordan",
+    dateOfBirth: "1997-01-14",
+    email: "jordan@example.demo",
+    phone: "(555) 010-0140",
+    address: "Bentonville, AR (synthetic demo)",
+    emergencyContact: "Taylor Lee · (555) 010-2210 (synthetic)",
+    notifications: { email: true, sms: false, reminders: true },
+  },
+  records: [],
+  resolvedTaskIds: [],
+  waitlistOfferPatientIds: [],
+  reviewedPatientIds: [],
 };
 
 export const clinics: Clinic[] = [

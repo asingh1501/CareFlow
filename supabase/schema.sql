@@ -38,3 +38,22 @@ alter table public.audit_logs enable row level security;
 
 -- Deliberately no permissive RLS policies are installed in the prototype.
 -- Production policies must be written and reviewed for each patient/staff/provider boundary.
+
+-- Care discovery and patient-owned record extensions. These tables intentionally
+-- remain inaccessible until reviewed RLS policies are installed.
+alter table public.clinics add column if not exists address text;
+alter table public.clinics add column if not exists postal_code text;
+alter table public.clinics add column if not exists latitude double precision;
+alter table public.clinics add column if not exists longitude double precision;
+alter table public.clinics add column if not exists directory_source text;
+alter table public.clinics add column if not exists verified_at timestamptz;
+
+create table if not exists public.patient_preferences (id uuid primary key default gen_random_uuid(), patient_id uuid not null unique references public.patient_profiles(id), location text, postal_code text, specialty text, radius_miles numeric not null default 100 check (radius_miles between 1 and 500), format text not null default 'Either', preferred_days jsonb not null default '[]'::jsonb, time_range text, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table if not exists public.medical_records (id uuid primary key default gen_random_uuid(), patient_id uuid not null references public.patient_profiles(id), category text not null, title text not null, details text, occurred_at date, source text not null default 'patient-entered', clinician_locked boolean not null default false, created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table if not exists public.medical_documents (id uuid primary key default gen_random_uuid(), patient_id uuid not null references public.patient_profiles(id), storage_key text not null unique, name text not null, category text not null, mime_type text not null, size_bytes bigint not null check (size_bytes > 0), source text not null default 'patient-uploaded', created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+create table if not exists public.appointment_status_history (id uuid primary key default gen_random_uuid(), appointment_id uuid not null references public.appointments(id), status text not null, actor_user_id uuid references public.users(id), note text, created_at timestamptz not null default now());
+
+alter table public.patient_preferences enable row level security;
+alter table public.medical_records enable row level security;
+alter table public.medical_documents enable row level security;
+alter table public.appointment_status_history enable row level security;

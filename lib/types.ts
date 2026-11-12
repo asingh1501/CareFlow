@@ -1,5 +1,6 @@
 export type Role = "patient" | "staff" | "provider";
 export type VisitFormat = "In person" | "Telehealth";
+export type VisitFormatPreference = VisitFormat | "Either";
 export type NavigationCategory =
   | "Routine / primary care"
   | "Same-day care"
@@ -20,15 +21,62 @@ export interface CareRequest {
   accessibility: string[];
   transportationDifficulty: boolean;
   emergencyWarning: boolean;
+  specialty: string;
+  radiusMiles: number;
 }
 
 export interface Clinic {
   id: string;
   name: string;
   city: string;
-  state: "AR";
+  state: string;
   rural: boolean;
   accessibility: string[];
+}
+
+export interface CarePreferences {
+  location: string;
+  zipCode: string;
+  specialty: string;
+  radiusMiles: number;
+  format: VisitFormatPreference;
+  preferredDays: string[];
+  timeRange: string;
+  accessibility: string[];
+}
+
+export type AppointmentRequestStatus = "draft" | "requested" | "confirmed-demo" | "cancelled" | "completed";
+
+export interface PatientAppointment {
+  id: string;
+  providerName: string;
+  facilityName: string;
+  specialty: string;
+  startsAt: string;
+  format: VisitFormat;
+  status: AppointmentRequestStatus;
+  source: "demo" | "external";
+  notes?: string;
+}
+
+export interface PatientProfileData {
+  fullName: string;
+  preferredName: string;
+  dateOfBirth: string;
+  email: string;
+  phone: string;
+  address: string;
+  emergencyContact: string;
+  notifications: { email: boolean; sms: boolean; reminders: boolean };
+}
+
+export interface PatientRecord {
+  id: string;
+  category: "condition" | "surgery" | "allergy" | "medication" | "lab" | "exam";
+  title: string;
+  date?: string;
+  details: string;
+  source: "patient-entered" | "clinician-record";
 }
 
 export interface Provider {
@@ -69,6 +117,14 @@ export interface DemoState {
   completedForms: string[];
   waitlistAccepted: boolean;
   jordanStatus: "Confirmed" | "Missing Forms" | "Ready";
+  preferences: CarePreferences;
+  favorites: string[];
+  appointmentRequests: PatientAppointment[];
+  profile: PatientProfileData;
+  records: PatientRecord[];
+  resolvedTaskIds: string[];
+  waitlistOfferPatientIds: string[];
+  reviewedPatientIds: string[];
 }
 
 export interface PatientRow {

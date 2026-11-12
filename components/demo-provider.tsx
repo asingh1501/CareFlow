@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { initialCareRequest, initialDemoState } from "@/lib/demo-data";
 import type { CareRequest, DemoState } from "@/lib/types";
 
@@ -20,6 +20,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [careRequest, setCareRequestState] = useState<CareRequest>(initialCareRequest);
   const [demoState, setDemoState] = useState<DemoState>(initialDemoState);
   const [toast, setToast] = useState<string | null>(null);
+  const careRequestRef = useRef<CareRequest>(initialCareRequest);
+  const demoStateRef = useRef<DemoState>(initialDemoState);
+  const toastTimer = useRef<number | null>(null);
+
+  const persist = useCallback((request: CareRequest, state: DemoState) => {
+    window.localStorage.setItem("careflow-demo", JSON.stringify({ careRequest: request, demoState: state }));
+  }, []);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("careflow-demo");
@@ -27,42 +34,61 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     try {
       const parsed = JSON.parse(saved) as { careRequest?: CareRequest; demoState?: DemoState };
       const timer = window.setTimeout(() => {
-        if (parsed.careRequest) setCareRequestState(parsed.careRequest);
-        if (parsed.demoState) setDemoState(parsed.demoState);
+        if (parsed.careRequest) {
+          const nextRequest = { ...initialCareRequest, ...parsed.careRequest };
+          careRequestRef.current = nextRequest;
+          setCareRequestState(nextRequest);
+        }
+        if (parsed.demoState) {
+          const nextState = {
+          ...initialDemoState,
+          ...parsed.demoState,
+          preferences: { ...initialDemoState.preferences, ...parsed.demoState.preferences },
+          profile: { ...initialDemoState.profile, ...parsed.demoState.profile, notifications: { ...initialDemoState.profile.notifications, ...parsed.demoState.profile?.notifications } },
+          favorites: parsed.demoState.favorites ?? [],
+          appointmentRequests: parsed.demoState.appointmentRequests ?? [],
+          records: parsed.demoState.records ?? [],
+          resolvedTaskIds: parsed.demoState.resolvedTaskIds ?? [],
+          waitlistOfferPatientIds: parsed.demoState.waitlistOfferPatientIds ?? [],
+          reviewedPatientIds: parsed.demoState.reviewedPatientIds ?? [],
+          };
+          demoStateRef.current = nextState;
+          setDemoState(nextState);
+        }
       }, 0);
       return () => window.clearTimeout(timer);
     } catch { /* Ignore stale presentation state. */ }
   }, []);
 
-  const persist = useCallback((request: CareRequest, state: DemoState) => {
-    window.localStorage.setItem("careflow-demo", JSON.stringify({ careRequest: request, demoState: state }));
-    void fetch("/api/demo-state", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ careRequest: request, demoState: state }) }).catch(() => undefined);
-  }, []);
-
   const setCareRequest = useCallback((value: CareRequest) => {
+    careRequestRef.current = value;
     setCareRequestState(value);
-    setDemoState((state) => { persist(value, state); return state; });
+    persist(value, demoStateRef.current);
   }, [persist]);
 
   const updateDemoState = useCallback((patch: Partial<DemoState>) => {
-    setDemoState((state) => {
-      const next = { ...state, ...patch };
-      setCareRequestState((request) => { persist(request, next); return request; });
-      return next;
-    });
+    const next = { ...demoStateRef.current, ...patch };
+    demoStateRef.current = next;
+    setDemoState(next);
+    persist(careRequestRef.current, next);
   }, [persist]);
 
   const resetDemo = useCallback(() => {
     setCareRequestState(initialCareRequest);
     setDemoState(initialDemoState);
+    careRequestRef.current = initialCareRequest;
+    demoStateRef.current = initialDemoState;
     persist(initialCareRequest, initialDemoState);
     setToast("Demo reset for a fresh presentation");
   }, [persist]);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(null), 3200);
+    if (toastTimer.current) window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(null), 3200);
   }, []);
+
+  useEffect(() => () => { if (toastTimer.current) window.clearTimeout(toastTimer.current); }, []);
 
   const value = useMemo(() => ({ careRequest, setCareRequest, demoState, updateDemoState, resetDemo, toast, showToast }), [careRequest, demoState, resetDemo, setCareRequest, showToast, toast, updateDemoState]);
 

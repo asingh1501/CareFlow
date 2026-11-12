@@ -15,6 +15,8 @@ export function extractIntake(message: string, current: CareRequest): CareReques
     availability: detectAvailability(text) ?? current.availability,
     transportationDifficulty: /no ride|transportation|cannot drive|can't drive/.test(text),
     emergencyWarning: containsEmergencyWarning(text),
+    specialty: detectSpecialty(text) ?? current.specialty,
+    radiusMiles: detectRadius(text) ?? current.radiusMiles,
   };
 }
 
@@ -44,9 +46,20 @@ function detectConcern(text: string): string | null {
 }
 
 function detectLocation(text: string): string | null {
-  const places = ["Bentonville", "Rogers", "Fayetteville", "Springdale", "Siloam Springs"];
-  const match = places.find((place) => text.includes(place.toLowerCase()));
-  return match ? `${match}, Arkansas` : null;
+  const places: [string, string][] = [["bentonville", "Bentonville, AR"], ["rogers", "Rogers, AR"], ["fayetteville", "Fayetteville, AR"], ["springdale", "Springdale, AR"], ["siloam springs", "Siloam Springs, AR"], ["joplin", "Joplin, MO"], ["tahlequah", "Tahlequah, OK"], ["tulsa", "Tulsa, OK"]];
+  return places.find(([key]) => text.includes(key))?.[1] ?? null;
+}
+
+function detectSpecialty(text: string): string | null {
+  const specialties: [RegExp, string][] = [[/dermatolog|skin doctor/, "Dermatology"], [/cardiolog|heart specialist/, "Cardiology"], [/neurolog/, "Neurology"], [/orthop/, "Orthopedics"], [/endocrin|diabetes specialist/, "Endocrinology"], [/behavioral|mental health|therap/, "Behavioral Health"], [/primary care|family doctor|check.?up/, "Primary Care"]];
+  return specialties.find(([rule]) => rule.test(text))?.[1] ?? null;
+}
+
+function detectRadius(text: string): number | null {
+  const match = text.match(/(?:within|up to|radius(?: of)?)\s*(\d{1,3})\s*miles?/i);
+  if (!match) return null;
+  const miles = Number(match[1]);
+  return miles >= 1 && miles <= 500 ? miles : null;
 }
 
 function detectAvailability(text: string): string | null {

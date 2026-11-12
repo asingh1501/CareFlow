@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { BarChart3, Bell, CalendarDays, ClipboardCheck, Home, RefreshCcw, Search, ShieldCheck, UserRound } from "lucide-react";
 import { Brand } from "./brand";
 import type { Role } from "@/lib/types";
@@ -11,8 +12,10 @@ const nav = {
   patient: [
     { href: "/patient", label: "Home", icon: Home },
     { href: "/patient/intake", label: "Find care", icon: Search },
+    { href: "/patient/providers", label: "Providers", icon: Search },
     { href: "/patient/appointments", label: "Appointments", icon: CalendarDays },
     { href: "/patient/forms", label: "Forms", icon: ClipboardCheck },
+    { href: "/patient/profile", label: "Profile", icon: UserRound },
   ],
   staff: [
     { href: "/staff", label: "Operations", icon: Home },
@@ -34,6 +37,7 @@ const roleNames = { patient: "Patient portal", staff: "Clinic operations", provi
 export function AppShell({ role, children }: { role: Role; children: React.ReactNode }) {
   const pathname = usePathname();
   const { resetDemo } = useDemo();
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const links = nav[role];
   return (
     <div className="app-page">
@@ -46,8 +50,8 @@ export function AppShell({ role, children }: { role: Role; children: React.React
           </nav>
           <div className="topbar-actions">
             <button className="btn btn-secondary" onClick={resetDemo}><RefreshCcw size={14} /> Reset demo</button>
-            <button className="icon-button" aria-label="Notifications"><Bell size={18} /></button>
-            <div className="avatar" aria-label={role === "patient" ? "Jordan Lee" : role === "staff" ? "Alex Morgan" : "Dr. Maya Patel"}>{role === "patient" ? "JL" : role === "staff" ? "AM" : "MP"}</div>
+            <div className="notification-wrap"><button className="icon-button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen((value) => !value)}><Bell size={18} /></button>{notificationsOpen && <div className="notification-popover" role="status"><strong>Demo notifications</strong><span>Appointment preparation is incomplete.</span><span>Your saved preferences are ready to use.</span></div>}</div>
+            <Link href={role === "patient" ? "/patient/profile" : role === "staff" ? "/staff" : "/provider"} className="avatar" aria-label={role === "patient" ? "Open Jordan Lee profile" : role === "staff" ? "Alex Morgan workspace" : "Dr. Maya Patel workspace"}>{role === "patient" ? "JL" : role === "staff" ? "AM" : "MP"}</Link>
           </div>
         </div>
       </header>

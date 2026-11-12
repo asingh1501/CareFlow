@@ -8,6 +8,13 @@
       "when": 1788556868707,
       "tag": "0000_sad_miracleman",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793991587304,
+      "tag": "0001_chemical_vision",
+      "breakpoints": true
     }
   ]
 }
