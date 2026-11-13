@@ -49,7 +49,7 @@ export function AppShell({ role, children }: { role: Role; children: React.React
             {links.map((item) => <Link key={item.href} href={item.href} className={`nav-link ${pathname === item.href ? "active" : ""}`}>{item.label}</Link>)}
           </nav>
           <div className="topbar-actions">
-            <button className="btn btn-secondary" onClick={resetDemo}><RefreshCcw size={14} /> Reset demo</button>
+            <button className="btn btn-secondary" onClick={() => resetDemo()}><RefreshCcw size={14} /> Reset demo</button>
             <div className="notification-wrap"><button className="icon-button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen((value) => !value)}><Bell size={18} /></button>{notificationsOpen && <div className="notification-popover" role="status"><strong>Demo notifications</strong><span>Appointment preparation is incomplete.</span><span>Your saved preferences are ready to use.</span></div>}</div>
             <Link href={role === "patient" ? "/patient/profile" : role === "staff" ? "/staff" : "/provider"} className="avatar" aria-label={role === "patient" ? "Open Jordan Lee profile" : role === "staff" ? "Alex Morgan workspace" : "Dr. Maya Patel workspace"}>{role === "patient" ? "JL" : role === "staff" ? "AM" : "MP"}</Link>
           </div>

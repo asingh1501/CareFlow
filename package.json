@@ -12,6 +12,7 @@
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "test": "npm run build && node --import tsx --test tests/*.test.ts",
     "test:e2e": "playwright test",
+    "demo:record": "node scripts/record-demo.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern playwright-report --ignore-pattern test-results",
     "db:generate": "drizzle-kit generate"
   },

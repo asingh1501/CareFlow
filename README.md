@@ -151,6 +151,18 @@ SUPABASE_SERVICE_ROLE_KEY=
 
 Use **Explore demo** on the landing page, or go directly to `/demo`.
 
+### Automated 40-second product tour
+
+Open `/demo` and select **Start Demo** to watch a same-origin controller drive the real patient dashboard, Find Care chat, provider search, appointment preferences, and health profile. The visible cursor clicks actual CareFlow controls and types into actual fields; no duplicate product mockup is used. The tour uses isolated synthetic records, does not place appointments, and resets its state before every run. Pause, Resume, Replay, and Exit are available throughout the presentation.
+
+To record the tour at 1920×1080 and convert it to MP4:
+
+```bash
+npm run demo:record
+```
+
+The command starts CareFlow when needed, records the complete tour with Playwright, and writes `artifacts/careflow-demo.webm` plus `artifacts/careflow-demo.mp4` when FFmpeg is installed. Set `CAREFLOW_BASE_URL` to record an already-running local or deployed version.
+
 Recommended presentation sequence:
 
 1. Open Patient Intake and select **Use Jordan’s demo request**.

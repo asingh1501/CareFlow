@@ -9,7 +9,7 @@ interface DemoContextValue {
   setCareRequest: (value: CareRequest) => void;
   demoState: DemoState;
   updateDemoState: (patch: Partial<DemoState>) => void;
-  resetDemo: () => void;
+  resetDemo: (options?: { silent?: boolean }) => void;
   toast: string | null;
   showToast: (message: string) => void;
 }
@@ -73,13 +73,17 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     persist(careRequestRef.current, next);
   }, [persist]);
 
-  const resetDemo = useCallback(() => {
+  const resetDemo = useCallback((options?: { silent?: boolean }) => {
     setCareRequestState(initialCareRequest);
     setDemoState(initialDemoState);
     careRequestRef.current = initialCareRequest;
     demoStateRef.current = initialDemoState;
     persist(initialCareRequest, initialDemoState);
-    setToast("Demo reset for a fresh presentation");
+    if (!options?.silent) {
+      setToast("Demo reset for a fresh presentation");
+      if (toastTimer.current) window.clearTimeout(toastTimer.current);
+      toastTimer.current = window.setTimeout(() => setToast(null), 3200);
+    }
   }, [persist]);
 
   const showToast = useCallback((message: string) => {
