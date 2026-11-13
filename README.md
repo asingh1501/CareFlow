@@ -33,6 +33,10 @@ The initial concept is focused on healthcare access in Arkansas while supporting
 
 The hosted prototype uses D1 because it can run immediately without external credentials. The domain and integration boundaries are intentionally portable to Supabase. `supabase/schema.sql` contains a PostgreSQL/UUID schema with row-level security enabled and no unsafe permissive policies. A production Supabase implementation should replace the demo repository adapter, not the business rules.
 
+## Hosted application
+
+The verified production deployment is available at [careflow-ar.vercel.app](https://careflow-ar.vercel.app). It runs in clearly labeled demonstration mode unless production service credentials and reviewed data integrations are configured.
+
 ## Architecture
 
 ```text
