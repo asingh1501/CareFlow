@@ -35,7 +35,7 @@ The hosted prototype uses D1 because it can run immediately without external cre
 
 ## Hosted application
 
-The verified production deployment is available at [careflow-ar.vercel.app](https://careflow-ar.vercel.app). It runs in clearly labeled demonstration mode unless production service credentials and reviewed data integrations are configured.
+The verified production deployment is available at [careflow-ar.vercel.app](https://careflow-ar.vercel.app), and the public source is hosted at [github.com/asingh1501/CareFlow](https://github.com/asingh1501/CareFlow). It runs in clearly labeled demonstration mode unless production service credentials and reviewed data integrations are configured.
 
 ## Architecture
 
